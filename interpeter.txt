@@ -1,0 +1,326 @@
+while True:  
+    print("\nPyString interpeter V:  0.2") 
+    from timeit import default_timer as timer
+    import random
+
+    line_input = 1
+    line = 0
+    code = []
+    code_line = ""
+    val = ''
+    var_name= ''
+    val_to_write = ""
+    statement = False
+    length_of_code = len(code) 
+    code_program = []
+
+    #lists of variables and values
+    variables = []
+    vals =[]
+
+    #lists and their names
+    list_names = []
+    lists  =  []
+
+    #lists of functions and their names
+    func_names = [ ]
+    funcs = []
+    if_list = ("==" , "!=" ,"<" , ">")
+    keywords = ("for" ,"if", "func")
+    equal_list = ("=", "+=")
+
+
+    
+    timer_start = timer()
+    #make code to output
+    print("______________________________")
+    print("")
+
+    x = 0
+    #separate the code per every line
+    while x <  len(code):
+        if type(code[x]) == str:
+            separated_code = code[x].split()
+        else:
+            separated_code = code[x]
+
+        if "//" in separated_code:
+            index_slash = separated_code.index("//")
+            for i in separated_code[index_slash:]:
+                separated_code.remove(i)
+
+        for i in range( len(separated_code) ):
+            #write var.változó ----> write "value of variable"
+            #recignize variables and manipulate codeline   
+            if i < len(separated_code) and  type( separated_code[i] ) == str and "var." in separated_code[i]:
+                almost_var_name = separated_code[i]
+                var_name = almost_var_name[4:]
+                if var_name in variables:
+                    l = variables.index(var_name)
+                    separated_code[i] = vals[l]
+
+
+            #recognize lists
+            if i < len(separated_code) and  type( separated_code[i] ) == str and "list." in separated_code[i]:
+                almost_list_name = separated_code[i]
+                list_name = almost_list_name[5:]
+                list_index = separated_code[i + 1]
+                if list_name in list_name:
+                    l = list_names.index(list_name)
+                    list = lists[l]
+                if list_index == "all":
+                    separated_code[i] = ", ".join(list) 
+                    separated_code[i + 1] = ""
+                else:
+                    separated_code[i] = list [int(list_index)]
+                    separated_code[i + 1] = ""
+
+
+                                #WORK ON THIS
+            #  do multiple things in one line
+            #write szia ; write világ
+            if i <= len(separated_code) and ";" == separated_code[i] and  separated_code[0] not in keywords:
+                index_of_end = separated_code.index(";")
+                index_of_end += 1  
+                code.insert(x + 1 , separated_code[index_of_end:])
+                separated_code[index_of_end -1:] = "" *len(separated_code[index_of_end -1:] )
+
+            #length 
+            #var greet = hello world ||| write var.greet length  ---> 9
+            if i < len(separated_code) and "length" ==  separated_code[i]:
+                length = len(separated_code[i - 1])         
+                separated_code[i - 1] = length    
+                separated_code.remove(separated_code[i] )
+                separated_code.append("")
+
+
+        #recognize functions
+        if i < len(separated_code) and  type(separated_code[i]) == str and "func." in separated_code[i]:
+            almost_func_name = separated_code[i]
+            func_name = almost_func_name[5:]
+            if func_name in func_names:
+                l = func_names.index(func_name)
+                #next line = function
+                code.insert(x + 1 , funcs[l])
+
+                #functin' is not assigned          
+
+
+        #random number between two number
+        if separated_code[0] not in keywords and "random:" in separated_code:
+            o = separated_code.index("random:")
+            low = int(separated_code[o + 1])
+            high = int(separated_code[o + 2])
+            rand_int = random.randint(low, high)
+            separated_code[o + 1] = ""
+            separated_code[o + 2] = ""
+            separated_code[o] = str(rand_int)
+
+            
+        #random choice
+        if separated_code[0] not in keywords and "ran_choice:" in separated_code:
+            d = separated_code.index("ran_choice:")
+            amount = separated_code[d +1] 
+            ch_from = separated_code[d + 2]
+            to_code = ""
+            for n in range(int(amount)):
+                to_code += random.choice(ch_from)
+            separated_code[d] = to_code
+            separated_code[d + 1] = " "
+            separated_code[d + 2] = " "
+
+
+        #random letter
+        if separated_code[0] not in keywords and "/ran_let" in separated_code:
+            j = separated_code.index("/ran_let")
+            separated_code[j] = random.choice("abcdefghijklmnopqrstvwxyqz")
+
+        #random number
+        if separated_code[0] not in keywords and "/ran_num" in separated_code:
+            u = separated_code.index("/ran_num")
+            separated_code[u] = random.choice("1234567890")
+
+
+        #lower
+        if "lower:" in separated_code and separated_code[0] not in keywords and ";" not in separated_code:
+            index_lower = separated_code.index("lower:")
+            separated_code[index_lower] = ""
+            #range because i need i as an int, not the ele
+            for i in range(len(separated_code[index_lower + 1:])):
+                separated_code[index_lower + 1 + i] = separated_code[index_lower + 1 + i].lower()
+
+
+        #upper
+        if "upper:" in separated_code and separated_code[0] not in keywords and ";" not in separated_code:
+            index_upper = separated_code.index("upper:")
+            separated_code[index_upper] = ""
+            #range because i need i as an int, not the ele
+            for i in range(len(separated_code[index_upper + 1:])):
+                separated_code[index_upper + 1 + i] = separated_code[index_upper + 1 + i].upper()
+
+
+        #sentence::   makes the first character uppercase, and adds dot to the end
+        if "sentence:" in separated_code and separated_code[0] not in keywords and ";" not in separated_code:
+            index_sen = separated_code.index("sentence:")
+            separated_code[index_sen] = ""
+            sentence_list = separated_code[index_sen + 1 :][0]
+            first_l = sentence_list[0]
+            #first letter -> uppercase
+            sentence_str = first_l.upper() + sentence_list[1:]
+            #adds dot
+            sentence_str += "."
+            separated_code[index_sen + 1 :] = sentence_str.split()
+                
+
+
+
+
+        #store variables and their values
+        #var változo = érték
+        if  separated_code[0] == "var" and separated_code[2] in equal_list:
+            name = separated_code[1]
+            #int as value
+            if separated_code[3] == "int:":
+                val = int(separated_code[4])
+
+            else:
+                #var változo = input kérdés
+                #input as value                          if it is an integer -> error
+                if  len(separated_code) > 4 and "scan:" in str(separated_code[3]) :
+                    if "up::" in separated_code[4]:
+                        question = ""
+                        question = " ".join(i for i in separated_code[5:])
+                        val = input(question).upper()
+                    elif"low::" in separated_code[4]:
+                        question = ""
+                        question = " ".join(i for i in separated_code[5:])
+                        val = input(question).lower()
+                    elif"char::" in separated_code[4]:
+                        question = input(question)
+                        val = question[0]
+                    else:
+                        question = ""
+                        question = " ".join(i for i in separated_code[4:])
+                        val = input(question)
+                else:
+                    val =  separated_code[3:]
+                if type(val) == list:
+                    val = " ".join(val)
+            #var változó += plusz érték
+            #add to values
+            if   "+=" in separated_code[2] :
+                space = ""
+                if separated_code[3] == "_":
+                    space = " "
+                    val =  separated_code[4:]
+                    val = " ".join(val)
+                vals[int(variables.index(name))] += space +val
+
+            #var változó = új érték
+            #reassign values
+            elif name in variables and "=" == separated_code[2]:
+                vals[variables.index(name)] = val
+            else:
+                vals.append(val)
+            variables.append(name)
+
+
+
+
+        #store lists
+        if  separated_code[0] == "list" and separated_code[3] in equal_list:
+            name = separated_code[1]
+            list_type = separated_code[2]
+            into_lists = separated_code[4:]
+            if len(separated_code) > 4 and separated_code[4] == "add:":
+                l = list_names.index(name)
+                lists[l].append(" ".join(into_lists[1:]))
+            else:
+                list_names.append(name)
+                lists.append(into_lists)
+
+
+
+
+        #store functions
+        #func funkction = do something /write hello world/
+        if separated_code[0] == "func" and separated_code[2] == "=":
+            function_name = separated_code[1] 
+            in_function =  separated_code[3:]
+            func_names.append(function_name)
+            funcs.append(in_function)
+
+
+            
+                #automatically string   
+        #write hello world
+        #writing
+        if separated_code[0] == "write":
+            to_write = separated_code[1:] 
+            print(*to_write)
+
+
+        #while cycle
+
+
+
+        # for 10 write hello world    
+        #for cycle
+        if separated_code[0] == "for":
+            for y in range(int(separated_code[1])):
+                index_of_koto = separated_code.index("-")    
+                index_of_koto += 1
+                code.insert(x + 1, separated_code[index_of_koto:])
+    
+
+
+        #if 5 == 6 than write true else if 5 != 5 than write true else write false        
+        #if statement
+        if separated_code[0] == "if" : 
+            statement = False
+            first = separated_code[1]
+            statement = separated_code[2]
+            second = separated_code[3]
+            than = separated_code.index("than") + 1
+            #integers
+            if separated_code[4] == "/int/":
+                first = int(first)
+                second = int(second) 
+
+            true_false = False
+            if statement == ">":
+                if first > second:
+                    true_false = True
+            if statement == "<":
+                if first < second:
+                    true_false = True
+            if statement == "==":
+                if first == second:
+                    true_false = True    
+            if statement == "!=":
+                if first != second:
+                    true_false = True
+            if statement == "in":
+                if first in second:
+                    true_false = True
+            #true without else
+            if true_false == True and "else" not in separated_code:
+                code.insert(x + 1, separated_code[than:])
+
+            #statement = false -> else
+            if true_false == False and "else" in separated_code:
+                index_of_else = separated_code.index("else")    
+                index_of_else += 1
+                code.insert(x + 1 , separated_code[index_of_else:])
+            
+            #statement = true -> ignore else
+            if true_false == True and "else" in separated_code:
+                index_of_else = separated_code.index("else")    
+                code.insert(x + 1 , separated_code[0:index_of_else])
+
+
+        x += 1
+    print("______________________________")
+    timer_end = timer()
+    time = round(timer_end - timer_start, 5)
+    print("Program ran in", time, "s")
